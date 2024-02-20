@@ -12,8 +12,8 @@ public class JwtProperties {
     /**
      * 管理端员工生成jwt令牌相关配置
      */
-    private String adminSecretKey;
-    private long adminTtl;
+    private String adminSecretKey;  //加密秘钥
+    private long adminTtl;  //time to live，jwt有效时长
     private String adminTokenName;
 
     /**

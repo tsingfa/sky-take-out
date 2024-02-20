@@ -1,6 +1,7 @@
 package com.sky.controller.admin;
 
 import com.sky.constant.JwtClaimsConstant;
+import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
 import com.sky.entity.Employee;
 import com.sky.properties.JwtProperties;
@@ -32,25 +33,23 @@ public class EmployeeController {
     private JwtProperties jwtProperties;
 
     /**
-     * 登录
+     * 员工登录
      *
      * @param employeeLoginDTO
-     * @return
      */
     @PostMapping("/login")
     public Result<EmployeeLoginVO> login(@RequestBody EmployeeLoginDTO employeeLoginDTO) {
         log.info("员工登录：{}", employeeLoginDTO);
-
+        // 1.登录
         Employee employee = employeeService.login(employeeLoginDTO);
-
-        //登录成功后，生成jwt令牌
+        // 2.登录成功，生成jwt令牌
         Map<String, Object> claims = new HashMap<>();
         claims.put(JwtClaimsConstant.EMP_ID, employee.getId());
         String token = JwtUtil.createJWT(
-                jwtProperties.getAdminSecretKey(),
+                jwtProperties.getAdminSecretKey(),  //用于加密得到signature
                 jwtProperties.getAdminTtl(),
                 claims);
-
+        // 3.组装成前端所需的结构对象（VO）
         EmployeeLoginVO employeeLoginVO = EmployeeLoginVO.builder()
                 .id(employee.getId())
                 .userName(employee.getUsername())
@@ -62,12 +61,19 @@ public class EmployeeController {
     }
 
     /**
-     * 退出
+     * 员工退出
      *
-     * @return
      */
     @PostMapping("/logout")
     public Result<String> logout() {
+        return Result.success();
+    }
+
+    // 新增员工（需由管理员或老员工操作）
+    @PostMapping
+    public Result save(@RequestBody EmployeeDTO employeeDTO){
+        log.info("新增员工:{}",employeeDTO);
+        employeeService.save(employeeDTO);
         return Result.success();
     }
 
